@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { useParams } from "react-router";
 import { useAsync } from "../hooks/useAsync";
 import { getPost } from "../services/posts";
@@ -12,11 +12,27 @@ export function usePost() {
 export function PostProvider({ children }) {
   const { id } = useParams();
   const { loading, error, value: post } = useAsync(() => getPost(id), [id]);
-  console.log(post);
+
+  const commentsByParentId = useMemo(() => {
+    if (post?.comments == null) return [];
+    const group = {};
+    post.comments.forEach((comment) => {
+      group[comment.parentId] ||= [];
+      group[comment.parentId].push(comment);
+    });
+    return group;
+  }, [post?.comments]);
+
+  function getRelies(parentId) {
+    return commentsByParentId[parentId];
+  }
+
   return (
     <Context.Provider
       value={{
         post: { id, ...post },
+        rootComments: commentsByParentId[null],
+        getRelies,
       }}
     >
       {loading ? (
