@@ -1,18 +1,12 @@
 import { PostList } from "./components/PostLists";
-import { useEffect, useState } from "react";
-import { getPosts } from "./services/posts";
+import { Routes, Route } from "react-router";
 
 function App() {
-  const [posts, setPosts] = useState();
-
-  useEffect(() => {
-    getPosts().then(setPosts);
-  }, []);
-
   return (
-    <h1>
-      <PostList />
-    </h1>
+    <Routes>
+      <Route path="/" element={<PostList />} />
+      <Route path="/posts/:id" element={null} />
+    </Routes>
   );
 }
 export default App;
