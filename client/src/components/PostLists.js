@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { getPosts } from "../services/posts";
 import { Link } from "react-router-dom";
+import { useAsync } from "../hooks/useAsync";
 
 export function PostList() {
-  const [posts, setPosts] = useState([]);
-
-  useEffect(() => {
-    getPosts().then(setPosts);
-  }, []);
+  const { loading, error, value: posts } = useAsync(getPosts);
 
   return posts.map((post) => {
     return (
