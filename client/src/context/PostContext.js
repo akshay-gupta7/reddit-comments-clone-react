@@ -23,7 +23,7 @@ export function PostProvider({ children }) {
     return group;
   }, [post?.comments]);
 
-  function getRelies(parentId) {
+  function getReplies(parentId) {
     return commentsByParentId[parentId];
   }
 
@@ -32,7 +32,7 @@ export function PostProvider({ children }) {
       value={{
         post: { id, ...post },
         rootComments: commentsByParentId[null],
-        getRelies,
+        getReplies,
       }}
     >
       {loading ? (
