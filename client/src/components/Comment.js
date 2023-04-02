@@ -1,6 +1,8 @@
 import { IconBtn } from "./iconBtn";
 import { FaEdit, FaHeart, FaReply, FaTrash } from "react-icons/fa";
 import { usePost } from "../context/PostContext";
+import { CommentList } from "./CommentList";
+import { useState } from "react";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "medium",
@@ -10,7 +12,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 export function Comment({ id, message, user, createdAt }) {
   const { getReplies } = usePost();
   const childComments = getReplies(id);
-  const areChildrenHidden = false;
+  const [areChildrenHidden, setAreChildrenHidden] = useState(false);
   return (
     <>
       <div className="comment">
@@ -35,8 +37,21 @@ export function Comment({ id, message, user, createdAt }) {
               areChildrenHidden ? "hide" : ""
             }`}
           >
-            <button className="collapse-line" aria-label="Hide Replies" />
+            <button
+              className="collapse-line"
+              aria-label="Hide Replies"
+              onClick={() => setAreChildrenHidden(true)}
+            />
+            <div className="nested-comments">
+              <CommentList comments={childComments} />
+            </div>
           </div>
+          <button
+            className={`btn mt-1 ${!areChildrenHidden ? "hide" : ""}`}
+            onClick={() => setAreChildrenHidden(false)}
+          >
+            Show Replies
+          </button>
         </>
       )}
     </>
