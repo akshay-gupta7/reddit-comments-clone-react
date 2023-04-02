@@ -1,3 +1,13 @@
+import { usePost } from "../context/PostContext";
+
 export function Post() {
-  return <h1>Hi</h1>;
+  const { post } = usePost();
+  return (
+    <>
+      <h1>{post.title}</h1>
+      <article>{post.body}</article>
+      <h3 className="comments-title">Comments</h3>
+      <section></section>
+    </>
+  );
 }
