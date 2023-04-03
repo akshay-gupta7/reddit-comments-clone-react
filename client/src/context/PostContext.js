@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { useParams } from "react-router";
 import { useAsync } from "../hooks/useAsync";
 import { getPost } from "../services/posts";
@@ -13,6 +13,8 @@ export function PostProvider({ children }) {
   const { id } = useParams();
   const { loading, error, value: post } = useAsync(() => getPost(id), [id]);
 
+  const [comments, setComments] = useState([]);
+
   const commentsByParentId = useMemo(() => {
     if (post?.comments == null) return [];
     const group = {};
@@ -23,8 +25,19 @@ export function PostProvider({ children }) {
     return group;
   }, [post?.comments]);
 
+  useEffect(() => {
+    if (post?.comments == null) return;
+    setComments(post.comments);
+  }, [post?.comments]);
+
   function getReplies(parentId) {
     return commentsByParentId[parentId];
+  }
+
+  function createLocalComment(comment) {
+    setComments((prevComments) => {
+      return [comment, ...prevComments];
+    });
   }
 
   return (
@@ -33,6 +46,7 @@ export function PostProvider({ children }) {
         post: { id, ...post },
         rootComments: commentsByParentId[null],
         getReplies,
+        createLocalComment,
       }}
     >
       {loading ? (
