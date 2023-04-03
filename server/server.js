@@ -3,16 +3,28 @@ import sensible from "@fastify/sensible";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import cors from "@fastify/cors";
+import cookie from "@fastify/cookie";
 
 dotenv.config();
 
 const app = fastify();
 app.register(sensible);
+app.register(cookie, { secret: process.env.COOKIE_SECRET });
 app.register(cors, {
   origin: process.env.CLIENT_URL,
   credentials: true,
 });
+app.addHook("onRequest", (req, res, done) => {
+  if (req.cookies.userId !== CURRENT_USER_ID) {
+    req.cookies.userId = CURRENT_USER_ID;
+    res.clearCookie("userId");
+    res.setCookie("userId", CURRENT_USER_ID);
+  }
+});
 const prisma = new PrismaClient();
+const CURRENT_USER_ID = (
+  await prisma.user.findFirst({ where: { name: "Kyle" } })
+).id;
 
 app.get("/posts", async (req, res) => {
   return await commitToDb(
@@ -58,6 +70,17 @@ app.post("/posts/:id/comments", async (req, res) => {
   if (req.body.message === "" || req.body.message == null) {
     return res.send(app.httpErrors.badRequest("Message is required"));
   }
+
+  return await commitToDb(
+    prisma.comment.create({
+      date: {
+        message: req.body.message,
+        userId: req.cookies.userId,
+        parentId: req.body.parentId,
+        postId: req.params.id,
+      },
+    })
+  );
 });
 
 async function commitToDb(promise) {
