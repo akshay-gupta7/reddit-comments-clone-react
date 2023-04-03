@@ -32,6 +32,7 @@ export function Comment({
     createLocalComment,
     updateLocalComment,
     deleteLocalComment,
+    toggleCommentLike,
   } = usePost();
   const childComments = getReplies(id);
   const [areChildrenHidden, setAreChildrenHidden] = useState(false);
