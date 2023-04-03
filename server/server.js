@@ -20,6 +20,7 @@ app.addHook("onRequest", (req, res, done) => {
     res.clearCookie("userId");
     res.setCookie("userId", CURRENT_USER_ID);
   }
+  done();
 });
 const prisma = new PrismaClient();
 const CURRENT_USER_ID = (
